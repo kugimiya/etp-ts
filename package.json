@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node dist/index.js"
+    "build": "tsc",
+    "start-benchmark": "npm run build && node dist/benchmark.js"
   },
   "keywords": [],
   "author": "",
