@@ -1,15 +1,15 @@
 {
-  "name": "threads_experiment",
+  "name": "etp-ts",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Thread Pool library",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "start-benchmark": "npm run build && node dist/benchmark.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "kugichka",
+  "license": "WTFPL",
   "dependencies": {
     "@types/node": "^20.12.7",
     "typescript": "^5.4.5"
