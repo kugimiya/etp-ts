@@ -13,6 +13,8 @@ This is an experimental project created to practice a library for a thread pool,
 
 ## Example
 
+Sum 2 numbers, 32 times, on all cpu cores
+
 ```typescript
 import { ETP } from 'etp-ts';
 import { cpus } from 'node:os';
