@@ -4,11 +4,23 @@
   "description": "Thread Pool library",
   "main": "dist/index.js",
   "scripts": {
+    "prepublish": "tsc",
     "build": "tsc",
     "start-benchmark": "npm run build && node dist/benchmark.js"
   },
-  "keywords": [],
-  "author": "kugichka",
+  "homepage": "https://github.com/kugimiya/etp-ts#readme",
+  "keywords": [
+    "thread-pool",
+    "multi-threading",
+    "parallel"
+  ],
+  "contributors": [
+    {
+      "name": "kugichka <Andrei Goncharov>",
+      "email": "kugi@kugi.club",
+      "url": "https://github.com/kugimiya"
+    }
+  ],
   "license": "WTFPL",
   "dependencies": {
     "@types/node": "^20.12.7",
