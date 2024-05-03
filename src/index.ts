@@ -33,10 +33,9 @@ type ToParentMessage<WorkerResult> = {
 function worker_logic<WorkerPayload>() {
   'use main';
 
-  const { parentPort, MessageChannel } = require('node:worker_threads');
-  const worker_channel = new MessageChannel();
+  const { parentPort } = require('node:worker_threads');
 
-  worker_channel.port1.on('message', (message: ToWorkerMessage<WorkerPayload>) => {
+  parentPort.on('message', (message: ToWorkerMessage<WorkerPayload>) => {
     if (message.type === ToWorkerMessageType.DoWork) {
       // @ts-ignore cause main will be defined in 'use main'; section at runtime
       (main as (...args: any) => Promise<any>)(message.payload.task_data)
@@ -47,19 +46,18 @@ function worker_logic<WorkerPayload>() {
     }
   });
 
-  parentPort.postMessage({ type: ToParentMessageType.WorkerPort, payload: worker_channel.port2 }, [worker_channel.port2]);
+  parentPort.postMessage({ type: ToParentMessageType.WorkerPort, payload: undefined });
 }
 
 export class ETP<WorkerPayload, WorkerResult> {
   task_id_counter = 0;
 
   threads: Worker[] = [];
-  threads_ports: MessagePort[] = [];
   threads_promise_resolvers: Record<number, (result: WorkerResult) => void> = {};
   threads_to_task_id_map: Record<number, number> = {};
 
   task_events: EventEmitter = new EventEmitter();
-  tasks: Record<number, (port: MessagePort) => void> = {};
+  tasks: Record<number, (worker: Worker) => void> = {};
 
   constructor(protected count: number, protected worker_main: (data: WorkerPayload) => Promise<WorkerResult>) {
     if (this.worker_main.name !== 'main') {
@@ -94,7 +92,6 @@ export class ETP<WorkerPayload, WorkerResult> {
 
       thread.on('message', (message: ToParentMessage<WorkerResult>) => {
         if (message.type === ToParentMessageType.WorkerPort) {
-          this.threads_ports.push(message.payload);
           received_ports_count += 1;
 
           if (received_ports_count === this.threads.length) {
@@ -122,8 +119,8 @@ export class ETP<WorkerPayload, WorkerResult> {
 
     return new Promise((resolve) => {
       this.threads_promise_resolvers[task_id] = resolve;
-      this.tasks[task_id] = (thread_port: MessagePort) => {
-        thread_port.postMessage({ type: ToWorkerMessageType.DoWork, payload: { task_id, task_data } })
+      this.tasks[task_id] = (worker: Worker) => {
+        worker.postMessage({ type: ToWorkerMessageType.DoWork, payload: { task_id, task_data } })
       };
       this.task_events.emit('task_added', task_id);
     });
@@ -142,17 +139,13 @@ export class ETP<WorkerPayload, WorkerResult> {
 
       if (thread_index != null && task_id != null) {
         this.threads_to_task_id_map[task_id] = thread_index;
-        task(this.threads_ports[thread_index]);
+        task(this.threads[thread_index]);
         delete this.tasks[task_id];
       }
     }
   }
 
   terminate() {
-    for (const port of this.threads_ports) {
-      port.close();
-    }
-
     for (const thread of this.threads) {
       thread.terminate();
     }

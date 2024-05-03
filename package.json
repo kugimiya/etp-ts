@@ -1,6 +1,6 @@
 {
   "name": "etp-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Thread Pool library",
   "main": "dist/index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     }
   ],
   "license": "WTFPL",
-  "dependencies": {
+  "devDependencies": {
     "@types/node": "^20.12.7",
     "typescript": "^5.4.5"
   }
