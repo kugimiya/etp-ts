@@ -2,13 +2,23 @@
 
 This is an experimental project created to practice a library for a thread pool, as well as for a stress test of this library in various scenarios
 
-
 ## Features
 
 - Does not require a separate file for the logic of the worker
 - TypeScript
 - Zero dependencies
 - async/await API
+
+## Requirements And Advices
+### Requirements
+`worker` code should be (see Example section):
+- placed in async function
+- take one argument
+- should be named as `main`
+### Advices
+- if the result of parallelization is composed in an array, I recommend that this array as SharedArrayBuffer be transferred to worker, and mutate it there
+- it also is related to sending large arrays to workers (>100 items); remember that node.js serves as sending to workers, so the serialization of arrays really consumes a lot of CPU time, and almost always in this case you need to use SharedArrayBuffer
+- remember that the main thread has bottleneck to send a large number of tasks to workers; so, if you send more than 10,000 tasks in one cycle, then the main thread simply will not have time to send tasks and take results, smoothly distributing the load on workers
 
 ## The Results Of The Experiment
 
@@ -57,7 +67,7 @@ console.log(results);
 etp.terminate();
 ```
 
-## Known issues
+## Known Issues
 
 ### __awaiter is not defined
 Also known as: `ReferenceError [Error]: __awaiter is not defined`. This happen bcause typescript compiler emit polyfills into source code, and `main` function got referrence to some polyfills; one of them is `__awaiter`.
