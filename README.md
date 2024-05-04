@@ -56,7 +56,7 @@ const promises: Promise<number>[] = [];
 
 // do work, store tasks
 for (const i = 0; i < 32; i++) {
-    promises.push(etp.do_work(Math.random(), Math.random()));
+    promises.push(etp.do_work([Math.random(), Math.random()]));
 }
 
 // so, results is array of numbers
