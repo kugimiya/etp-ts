@@ -1,5 +1,5 @@
-import worker_threads, { Worker } from 'node:worker_threads';
-import EventEmitter from "node:events";
+import { Worker } from 'node:worker_threads';
+import { EventEmitter } from "node:events";
 import { readFileSync } from 'node:fs';
 
 enum ToWorkerMessageType {
@@ -87,7 +87,7 @@ export class ETP<WorkerPayload, WorkerResult> {
       const worker_code = readFileSync(__filename).toString()
         .replace(`'use` + ` main';`, main_as_text) + `\n worker_logic();`;
 
-      const thread = new worker_threads.Worker(worker_code, { eval: true });
+      const thread = new Worker(worker_code, { eval: true });
       this.threads.push(thread);
 
       thread.on('message', (message: ToParentMessage<WorkerResult>) => {

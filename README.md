@@ -1,4 +1,3 @@
-
 # ETP - Experimental Thread Pool
 
 This is an experimental project created to practice a library for a thread pool, as well as for a stress test of this library in various scenarios
@@ -34,7 +33,7 @@ import { cpus } from 'node:os';
 
 // worker logic
 // SHOULD be async function named as 'main'
-async function main(a, b) {
+async function main([a, b]: [number, number]) {
     return a + b;
 }
 
@@ -43,7 +42,7 @@ const etp = new ETP(cpus().length, main);
 await etp.init();
 
 // every ETP's task is promise, so we should store them
-const promises = [];
+const promises: Promise<number>[] = [];
 
 // do work, store tasks
 for (const i = 0; i < 32; i++) {
@@ -53,7 +52,17 @@ for (const i = 0; i < 32; i++) {
 // so, results is array of numbers
 const results = await Promise.all(promises);
 console.log(results);
+
+// then, close thread pool
+etp.terminate();
 ```
+
+## Known issues
+
+### __awaiter is not defined
+Also known as: `ReferenceError [Error]: __awaiter is not defined`. This happen bcause typescript compiler emit polyfills into source code, and `main` function got referrence to some polyfills; one of them is `__awaiter`.
+### Fix
+Tune `tsconfig.json`, section `compilerOptions` > `target` should be `es2020` or greater ES version.
 
 ## Run Benchmark Locally
 
